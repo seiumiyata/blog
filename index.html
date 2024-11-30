@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI プロンプトクリエーター</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #16213e;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #00fff5;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #0f3460;
+            color: #e0e0e0;
+            border: 1px solid #00fff5;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #00fff5;
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #00cccc;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-top: 15px;
+            color: #00fff5;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #00fff5;
+            background-color: #0f3460;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI プロンプトクリエーター</h1>
+        <form id="promptForm">
+            <label for="referenceUrl">参考ブログURL:</label>
+            <input type="url" id="referenceUrl">
+
+            <label for="blogTitle">ブログタイトル:</label>
+            <input type="text" id="blogTitle" required>
+
+            <label for="blogContent">主な内容:</label>
+            <textarea id="blogContent" rows="4" required></textarea>
+
+            <label for="wordCount">希望文字数:</label>
+            <input type="number" id="wordCount" required>
+
+            <label for="contentType">コンテンツタイプ:</label>
+            <select id="contentType">
+                <option value="eeat">EEAT重視</option>
+                <option value="creative">創造的な内容</option>
+            </select>
+
+            <label for="audience">想定読者層:</label>
+            <select id="audience">
+                <option value="general">一般読者</option>
+                <option value="business">ビジネスパーソン</option>
+                <option value="tech">技術者</option>
+                <option value="student">学生</option>
+            </select>
+
+            <label for="tone">文体トーン:</label>
+            <select id="tone">
+                <option value="casual">カジュアル</option>
+                <option value="formal">フォーマル</option>
+                <option value="technical">専門的</option>
+            </select>
+
+            <label for="bulletPoints">箇条書きの使用:</label>
+            <select id="bulletPoints">
+                <option value="none">使用しない</option>
+                <option value="minimal">最小限に使用</option>
+                <option value="normal">通常使用</option>
+            </select>
+
+            <div class="button-group">
+                <button type="submit">プロンプト生成</button>
+                <button type="button" id="copyButton" style="display:none;">コピー</button>
+            </div>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('promptForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const referenceUrl = document.getElementById('referenceUrl').value;
+            const blogTitle = document.getElementById('blogTitle').value;
+            const blogContent = document.getElementById('blogContent').value;
+            const wordCount = document.getElementById('wordCount').value;
+            const contentType = document.getElementById('contentType').value;
+            const audience = document.getElementById('audience').value;
+            const tone = document.getElementById('tone').value;
+            const bulletPoints = document.getElementById('bulletPoints').value;
+
+            const prompt = `
+ブログ記事作成プロンプト:
+
+タイトル: ${blogTitle}
+参考URL: ${referenceUrl}
+希望文字数: ${wordCount}文字
+コンテンツタイプ: ${contentType}
+想定読者: ${audience}
+文体トーン: ${tone}
+箇条書きの使用: ${bulletPoints}
+
+主な内容:
+${blogContent}
+
+指示:
+1. 上記の要件に基づいて、読者を魅了する記事を作成してください。
+2. 記事は読み物として自然に流れるように構成してください。
+3. 段落を適切に使用し、読みやすさを重視してください。
+4. 箇条書きの使用は指定された頻度に従ってください。
+5. 専門用語がある場合は、読者層に合わせて適切に説明を加えてください。
+6. 記事の冒頭で読者の興味を引き、最後まで読ませる工夫をしてください。
+7. 結論や次のアクションを明確に示し、読者に価値を提供してください。
+            `.trim();
+
+            document.getElementById('result').innerText = prompt;
+            document.getElementById('copyButton').style.display = 'inline-block';
+        });
+
+        document.getElementById('copyButton').addEventListener('click', function() {
+            const resultText = document.getElementById('result').innerText;
+            navigator.clipboard.writeText(resultText).then(function() {
+                alert('プロンプトをクリップボードにコピーしました。');
+            }, function(err) {
+                console.error('コピーに失敗しました: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
